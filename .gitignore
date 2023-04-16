@@ -1,0 +1,9 @@
+venv
+build
+dist
+.pytest_cache
+.tox
+__pycache__
+*.egg-info
+.DS_STORE
+.idea

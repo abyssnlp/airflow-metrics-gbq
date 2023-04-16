@@ -1,0 +1,15 @@
+[MESSAGE CONTROL]
+disable=missing-module-docstring,
+        fixme,
+        logging-fstring-interpolation,
+        deprecated-argument,
+        too-many-arguments,
+        invalid-name,
+        line-too-long,
+        no-member,
+        unused-argument,
+        too-many-locals,
+        simplifiable-if-expression
+
+[MASTER]
+ignore-paths = ^ci/.*$,^tests/.*$
