@@ -2,7 +2,7 @@ import logging
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
 
-from .gbq_connector import GoogleBigQueryConnector
+from airflow_metrics_gbq.utils.gbq_connector import GoogleBigQueryConnector
 
 
 def setup_gcloud_logging(app_name, gcp_credentials_path):

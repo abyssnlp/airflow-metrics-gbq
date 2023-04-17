@@ -6,7 +6,7 @@ from typing import Optional
 from collections import defaultdict
 import pandas as pd
 
-from .utils import GoogleBigQueryConnector, setup_gcloud_logging
+from airflow_metrics_gbq.utils import GoogleBigQueryConnector, setup_gcloud_logging
 
 
 # pylint: disable=too-few-public-methods

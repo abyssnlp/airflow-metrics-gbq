@@ -9,7 +9,7 @@ Sends airflow metrics to Bigquery
 - Add `setup.py`
 - Add `ci`
 - Add github workflow
-- Package release
+- Package release based on Tag
 - Better docs and sphinx docs from docstrings
 - To pypi
 
