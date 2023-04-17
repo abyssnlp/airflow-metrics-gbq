@@ -7,7 +7,9 @@ Sends airflow metrics to Bigquery
 - List steps to send (activate statsd in airflow.cfg etc)
 - Add `ci`
 - Add github workflow
-- CODEOWNERS, Pull request template, Workflow for PR, custom actions
+- CODEOWNERS, Pull request template
+- Workflow for PR
+- custom actions
 - Package release based on Tag
 - Better docs and sphinx docs from docstrings
 - To pypi
