@@ -1,10 +1,24 @@
 [tool.poetry]
 name = "airflow-metrics-gbq"
-version = "0.0.1"
+version = "0.0.2"
 description = "Airflow metrics to Google BigQuery"
 authors = ["Shaurya Rawat <rawatshaurya1994@gmail.com>"]
 license = "BSD2"
 readme = "README.md"
+homepage="https://github.com/abyssnlp/airflow-metrics-gbq"
+repository="https://github.com/abyssnlp/airflow-metrics-gbq"
+include=[
+    "LICENSE",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: Apache Airflow",
+    "License :: OSI Approved :: BSD License"
+]
 packages = [{include = "airflow_metrics_gbq"}]
 
 [tool.poetry.dependencies]
