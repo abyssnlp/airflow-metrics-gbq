@@ -34,3 +34,9 @@ jobs:
           files: |
             LICENSE
             dist/*
+      - name: Configure poetry with pypi
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+      - name: Push to pypi
+        run: |
+          poetry publish
