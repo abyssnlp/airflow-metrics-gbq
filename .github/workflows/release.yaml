@@ -1,10 +1,13 @@
-name: build
+name: release
 
 on:
   push:
-    branches:
-      - master
-      - develop
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,11 +26,17 @@ jobs:
         run: python -m poetry config virtualenvs.create false
       - name: Install dependencies
         run: python -m poetry install
-      - name: Format check
-        run: black .
-      - name: Flake8
-        run: poetry run flake8 . --count --show-source --statistics
-      - name: Lint with pylint
-        run: pylint **/*.py
-      - name: Test library
-        run: poetry run pytest
+      - name: Build artifacts
+        run: poetry build
+      - name: Create github release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            LICENSE
+            dist/*
+      - name: Configure poetry with pypi
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+      - name: Push to pypi
+        run: |
+          poetry publish
