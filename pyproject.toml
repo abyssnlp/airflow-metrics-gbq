@@ -24,7 +24,7 @@ packages = [{include = "airflow_metrics_gbq"}]
 [tool.poetry.dependencies]
 python = "^3.8.1"
 pandas = "^2.0.0"
-google-cloud-bigquery = "^3.9.0"
+google-cloud-bigquery = {extras = ["pandas"], version = "^3.10.0"}
 google-api-python-client = "^2.85.0"
 google-cloud-logging = "^3.5.0"
 
