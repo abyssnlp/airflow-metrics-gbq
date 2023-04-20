@@ -12,3 +12,9 @@
 ### Feature
 * Added better release processes ([`c0e9dfa`](https://github.com/abyssnlp/airflow-metrics-gbq/commit/c0e9dfaf3cf03708d4426b79768aa0947e44c340),
 [`d682e32`](https://github.com/abyssnlp/airflow-metrics-gbq/commit/d682e32484252fcc99484f05cc4ec785bd81febd))
+
+---
+
+## v0.0.4 (2023-04-20)
+### Fix
+* Minor code fixes
