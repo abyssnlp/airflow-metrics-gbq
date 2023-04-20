@@ -3,51 +3,46 @@ import socket
 import time
 import random
 from typing import Optional
+from enum import Enum, unique
 from collections import defaultdict
+from dataclasses import dataclass
 import pandas as pd
 
 from airflow_metrics_gbq.utils import GoogleBigQueryConnector, setup_gcloud_logging
 
 
 # pylint: disable=too-few-public-methods
+@dataclass
 class Point:
     """Represents a single metric record"""
 
-    def __init__(
-        self,
-        app,
-        domain,
-        value,
-        timestamp,
-        check: Optional[str] = None,
-        name: Optional[str] = None,
-    ):
-        self.app = app
-        self.domain = domain
-        self.check = check
-        self.value = value
-        self.timestamp = timestamp
-        self.name = name
+    app: str
+    domain: str
+    value: float
+    timestamp: float
+    check: Optional[str] = None
+    name: Optional[str] = None
 
 
-class Measure:
+@unique
+class Measure(Enum):
     """Type of measure"""
 
     COUNT = "count"
     LAST = "last"
     TIMER = "timer"
 
+    @classmethod
+    def from_mtype(cls, mtype: str) -> "Measure":
+        """Maps a suffix to a measure type"""
 
-def from_mtype(mtype) -> Measure:
-    """Maps a suffix to a measure type"""
-
-    mtype_map = {
-        "c": Measure.COUNT,
-        "g": Measure.LAST,
-        "ms": Measure.TIMER,
-        "s": Measure.TIMER,
-    }
-    return mtype_map[mtype]
+        mtype_map = {
+            "c": Measure.COUNT,
+            "g": Measure.LAST,
+            "ms": Measure.TIMER,
+            "s": Measure.TIMER,
+        }
+        return mtype_map[mtype]
 
 
 class PointWithType:
@@ -63,7 +58,7 @@ class PointWithType:
     def from_record(record: str) -> "PointWithType":
         """Creates an instance from a raw record"""
         line, mtype = record.split(PointWithType.SEPARATOR)
-        mtype = from_mtype(mtype)
+        mtype = Measure.from_mtype(mtype)
         line, val = line.split(":")
         fields = line.split(".")
         timestamp = time.time()
