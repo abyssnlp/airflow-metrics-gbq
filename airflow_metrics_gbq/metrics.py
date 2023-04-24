@@ -6,6 +6,7 @@ from typing import Optional
 from enum import Enum, unique
 from collections import defaultdict
 from dataclasses import dataclass
+from multiprocessing import Queue
 import pandas as pd
 
 from airflow_metrics_gbq.utils import GoogleBigQueryConnector, setup_gcloud_logging
@@ -106,7 +107,8 @@ class AirflowMonitor:
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = gcp_credentials
         self.gbq_connector = GoogleBigQueryConnector(gcp_credentials)
         self.logger = setup_gcloud_logging("airflow_monitoring", gcp_credentials)
-        self._buffer = []
+        # buffer
+        self._buffer = Queue()
         self._current = 0
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._sock.bind((host, port))
