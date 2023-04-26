@@ -62,8 +62,7 @@ python monitor.py &
 
 
 **Future releases**
-- [ ] Add a buffer (pyzmq or mp queue)
-- [ ] Run sending metrics to GBQ in another process
+- [ ] Increase test coverage
 - [ ] Add proper typing and mypy support and checks
 - [ ] Provide more configurable options
 - [ ] Provide better documentation
