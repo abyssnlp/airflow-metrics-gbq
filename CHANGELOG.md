@@ -17,4 +17,11 @@
 
 ## v0.0.4a0 (2023-04-20)
 ### Fix
-* Minor code fixes ([`eec8add`](https://github.com/abyssnlp/airflow-metrics-gbq/commit/eec8add389db7eedc3976597b7bccf3d9d86d58a))
+* Minor code fixes
+
+---
+
+## 0.0.4a1 (2023-04-26)
+### Feature
+* Better type annotations, Time and capacity based buffers, Background thread to fetch from socket, Adds retry for better
+fault tolerance ([`a54b0db`](https://github.com/abyssnlp/airflow-metrics-gbq/commit/a54b0db1e55d7822476d7812cd3749a2f99cc7b4))
