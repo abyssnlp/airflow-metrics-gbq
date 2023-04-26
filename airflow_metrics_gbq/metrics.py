@@ -219,7 +219,7 @@ class AirflowMonitor:
 
         df_counts, df_last, df_timer = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
-        if len(measure_dict["count"]) > 0:
+        if len(measure_dict[Measure.COUNT]) > 0:
             df_counts = (
                 pd.DataFrame([record.__dict__ for record in measure_dict["count"]])
                 .groupby(["app", "domain", "check", "name"], dropna=False)
@@ -227,7 +227,7 @@ class AirflowMonitor:
                 .reset_index(drop=False)
             )
 
-        if len(measure_dict["last"]) > 0:
+        if len(measure_dict[Measure.LAST]) > 0:
             df_last = (
                 pd.DataFrame([record.__dict__ for record in measure_dict["last"]])
                 .groupby(["app", "domain", "check", "name"], dropna=False)
@@ -235,7 +235,7 @@ class AirflowMonitor:
                 .reset_index(drop=False)
             )
 
-        if len(measure_dict["timer"]) > 0:
+        if len(measure_dict[Measure.TIMER]) > 0:
             df_timer = pd.DataFrame([record.__dict__ for record in measure_dict["timer"]])
             df_timer = df_timer[
                 (df_timer["domain"].isin(["dag", "collect_db_dags"]))
@@ -249,7 +249,7 @@ class AirflowMonitor:
 
     def send_metrics(self, metrics: t.List[PointWithType]):
         """Entrypoint to run a continuous loop"""
-
+        self.logger.debug(f"[send_metrics] Metrics received: {len(metrics)}")
         df_counts, df_last, df_timer = self._get_dfs(metrics)
         df_counts = self.fix_pd_to_bq_types(df_counts, self.dataset_id, self.counts_table)
         df_last = self.fix_pd_to_bq_types(df_last, self.dataset_id, self.last_table)
