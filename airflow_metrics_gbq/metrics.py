@@ -220,7 +220,7 @@ class AirflowMonitor:
 
         if len(measure_dict[Measure.COUNT]) > 0:
             df_counts = (
-                pd.DataFrame([record.__dict__ for record in measure_dict["count"]])
+                pd.DataFrame([record.__dict__ for record in measure_dict[Measure.COUNT]])
                 .groupby(["app", "domain", "check", "name"], dropna=False)
                 .aggregate({"value": "sum", "timestamp": "last"})
                 .reset_index(drop=False)
@@ -228,14 +228,14 @@ class AirflowMonitor:
 
         if len(measure_dict[Measure.LAST]) > 0:
             df_last = (
-                pd.DataFrame([record.__dict__ for record in measure_dict["last"]])
+                pd.DataFrame([record.__dict__ for record in measure_dict[Measure.LAST]])
                 .groupby(["app", "domain", "check", "name"], dropna=False)
                 .aggregate({"value": "last", "timestamp": "last"})
                 .reset_index(drop=False)
             )
 
         if len(measure_dict[Measure.TIMER]) > 0:
-            df_timer = pd.DataFrame([record.__dict__ for record in measure_dict["timer"]])
+            df_timer = pd.DataFrame([record.__dict__ for record in measure_dict[Measure.TIMER]])
             df_timer = df_timer[
                 (df_timer["domain"].isin(["dag", "collect_db_dags"]))
                 | (
