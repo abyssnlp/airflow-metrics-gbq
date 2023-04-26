@@ -25,4 +25,9 @@
 ### Feature
 * Better type annotations, Time and capacity based buffers, Background thread to fetch from socket, Adds retry for better
 fault tolerance ([`a54b0db`](https://github.com/abyssnlp/airflow-metrics-gbq/commit/a54b0db1e55d7822476d7812cd3749a2f99cc7b4))
+
+---
+
+## v0.0.4a2, v0.0.4a3 (2023-04-26)
 * Fix Measure type enum
+* Fix background processes

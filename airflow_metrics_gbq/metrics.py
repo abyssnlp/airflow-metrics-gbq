@@ -129,19 +129,18 @@ class AirflowMonitor:
         self._buffer = Queue(maxsize=self.CAPACITY + 50)
         self.monitor_batch = threading.Event()
         self.monitor_batch.set()
-        self.pool.submit(self.monitor).add_done_callback(self.callback)
 
         # Flush running
         self.is_flush_running = threading.Event()
         self.is_flush_running.clear()
 
-        # Fetch into queue from socket
-        self.pool.submit(self._fetch).add_done_callback(self.callback)
-
         # Metrics connection
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._sock.bind((host, port))
 
+        # Fetch into queue from socket
+        self.pool.submit(self._fetch).add_done_callback(self.callback)
+        self.pool.submit(self.monitor).add_done_callback(self.callback)
         atexit.register(self.close)
 
     def monitor(self):
