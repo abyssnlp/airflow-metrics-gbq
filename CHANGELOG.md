@@ -15,6 +15,6 @@
 
 ---
 
-## v0.0.4 (2023-04-20)
+## v0.0.4a0 (2023-04-20)
 ### Fix
-* Minor code fixes
+* Minor code fixes ([`eec8add`](https://github.com/abyssnlp/airflow-metrics-gbq/commit/eec8add389db7eedc3976597b7bccf3d9d86d58a))
