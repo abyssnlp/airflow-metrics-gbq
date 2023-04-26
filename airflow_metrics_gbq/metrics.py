@@ -129,19 +129,18 @@ class AirflowMonitor:
         self._buffer = Queue(maxsize=self.CAPACITY + 50)
         self.monitor_batch = threading.Event()
         self.monitor_batch.set()
-        self.pool.submit(self.monitor).add_done_callback(self.callback)
 
         # Flush running
         self.is_flush_running = threading.Event()
         self.is_flush_running.clear()
 
-        # Fetch into queue from socket
-        self.pool.submit(self._fetch).add_done_callback(self.callback)
-
         # Metrics connection
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._sock.bind((host, port))
 
+        # Fetch into queue from socket
+        self.pool.submit(self._fetch).add_done_callback(self.callback)
+        self.pool.submit(self.monitor).add_done_callback(self.callback)
         atexit.register(self.close)
 
     def monitor(self):
@@ -219,24 +218,24 @@ class AirflowMonitor:
 
         df_counts, df_last, df_timer = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
-        if len(measure_dict["count"]) > 0:
+        if len(measure_dict[Measure.COUNT]) > 0:
             df_counts = (
-                pd.DataFrame([record.__dict__ for record in measure_dict["count"]])
+                pd.DataFrame([record.__dict__ for record in measure_dict[Measure.COUNT]])
                 .groupby(["app", "domain", "check", "name"], dropna=False)
                 .aggregate({"value": "sum", "timestamp": "last"})
                 .reset_index(drop=False)
             )
 
-        if len(measure_dict["last"]) > 0:
+        if len(measure_dict[Measure.LAST]) > 0:
             df_last = (
-                pd.DataFrame([record.__dict__ for record in measure_dict["last"]])
+                pd.DataFrame([record.__dict__ for record in measure_dict[Measure.LAST]])
                 .groupby(["app", "domain", "check", "name"], dropna=False)
                 .aggregate({"value": "last", "timestamp": "last"})
                 .reset_index(drop=False)
             )
 
-        if len(measure_dict["timer"]) > 0:
-            df_timer = pd.DataFrame([record.__dict__ for record in measure_dict["timer"]])
+        if len(measure_dict[Measure.TIMER]) > 0:
+            df_timer = pd.DataFrame([record.__dict__ for record in measure_dict[Measure.TIMER]])
             df_timer = df_timer[
                 (df_timer["domain"].isin(["dag", "collect_db_dags"]))
                 | (
@@ -249,7 +248,7 @@ class AirflowMonitor:
 
     def send_metrics(self, metrics: t.List[PointWithType]):
         """Entrypoint to run a continuous loop"""
-
+        self.logger.debug(f"[send_metrics] Metrics received: {len(metrics)}")
         df_counts, df_last, df_timer = self._get_dfs(metrics)
         df_counts = self.fix_pd_to_bq_types(df_counts, self.dataset_id, self.counts_table)
         df_last = self.fix_pd_to_bq_types(df_last, self.dataset_id, self.last_table)
