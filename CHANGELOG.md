@@ -1,5 +1,16 @@
 # Changelog
 
+[//]: # (Next Release)
+
+---
+
+## v0.0.5 (2023-04-28)
+### Fix
+* Increase buffer capacity, Increased retry attempts and add retry statistics logging([`cf3b3eb`](https://github.com/abyssnlp/airflow-metrics-gbq/commit/cf3b3eb2ff820d89d30b7e4fbcf4f7f48a198b7d))
+
+
+---
+
 ## v0.0.4 (2023-04-26)
 ### Feature
 * Better type annotations, Time and capacity based buffers, Background thread to fetch from socket, Adds retry for better
