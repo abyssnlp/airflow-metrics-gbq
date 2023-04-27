@@ -100,7 +100,7 @@ class PointWithType:
 class AirflowMonitor:
     """Main class to ship metrics to GBQ"""
 
-    CAPACITY: t.Final = 500
+    CAPACITY: t.Final = 1000
     BATCH_TIME: t.Final = 5
 
     def __init__(
@@ -195,7 +195,7 @@ class AirflowMonitor:
     @retry(
         retry=(retry_if_exception_type(queue.Full) | retry_if_exception_type(NoMetricFoundException)),
         wait=wait_fixed(2) + wait_random(0, 2),
-        stop=stop_after_attempt(5),
+        stop=stop_after_attempt(10),
         reraise=True,
     )
     def _fetch(self):
