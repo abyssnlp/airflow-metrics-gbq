@@ -101,7 +101,7 @@ class AirflowMonitor:
     """Main class to ship metrics to GBQ"""
 
     CAPACITY: t.Final = 1000
-    BATCH_TIME: t.Final = 5
+    BATCH_TIME: t.Final = 15
 
     def __init__(
         self,
