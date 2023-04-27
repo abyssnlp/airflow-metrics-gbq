@@ -196,6 +196,7 @@ class AirflowMonitor:
         retry=(retry_if_exception_type(queue.Full) | retry_if_exception_type(NoMetricFoundException)),
         wait=wait_fixed(2) + wait_random(0, 2),
         stop=stop_after_attempt(5),
+        reraise=True,
     )
     def _fetch(self):
         """Fetch metrics from Airflow"""
@@ -209,6 +210,7 @@ class AirflowMonitor:
                 # non blocking
                 self._buffer.put_nowait(PointWithType.from_record(measure))
             except queue.Full as e:
+                self.logger.debug(self._fetch.retry.statistics)
                 self.logger.error("Queue is full")
                 raise e
 
