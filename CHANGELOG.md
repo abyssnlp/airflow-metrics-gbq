@@ -7,6 +7,7 @@
 ## v0.0.5 (2023-04-28)
 ### Fix
 * Increase buffer capacity, Increased retry attempts and add retry statistics logging([`cf3b3eb`](https://github.com/abyssnlp/airflow-metrics-gbq/commit/cf3b3eb2ff820d89d30b7e4fbcf4f7f48a198b7d))
+* Increase buffer flush timeout to 15 seconds ([`9c3ec4c`](https://github.com/abyssnlp/airflow-metrics-gbq/commit/9c3ec4cd53e24a25d728c85b8f49b20b6266533a))
 
 
 ---
