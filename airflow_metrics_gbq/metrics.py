@@ -16,8 +16,7 @@ import pandas as pd
 from tenacity import (
     retry,
     retry_if_exception_type,
-    wait_fixed,
-    wait_random,
+    wait_exponential,
     stop_after_attempt,
 )
 
@@ -194,8 +193,8 @@ class AirflowMonitor:
 
     @retry(
         retry=(retry_if_exception_type(queue.Full) | retry_if_exception_type(NoMetricFoundException)),
-        wait=wait_fixed(2) + wait_random(0, 2),
-        stop=stop_after_attempt(10),
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        stop=stop_after_attempt(20),
         reraise=True,
     )
     def _fetch(self):
