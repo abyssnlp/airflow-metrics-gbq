@@ -62,7 +62,7 @@ python monitor.py &
 
 
 **Future releases**
-- [ ] Increase test coverage
+- [ ] Increase test coverage (unit and integration tests)
 - [ ] Add proper typing and mypy support and checks
 - [ ] Provide more configurable options
 - [ ] Provide better documentation
