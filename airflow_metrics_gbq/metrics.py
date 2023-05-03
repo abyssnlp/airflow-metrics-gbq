@@ -17,7 +17,6 @@ from tenacity import (
     retry,
     retry_if_exception_type,
     wait_exponential,
-    stop_after_attempt,
 )
 
 from airflow_metrics_gbq.utils import GoogleBigQueryConnector, setup_gcloud_logging
@@ -193,8 +192,7 @@ class AirflowMonitor:
 
     @retry(
         retry=(retry_if_exception_type(queue.Full) | retry_if_exception_type(NoMetricFoundException)),
-        wait=wait_exponential(multiplier=1, min=4, max=10),
-        stop=stop_after_attempt(20),
+        wait=wait_exponential(multiplier=1, min=4, max=20),
         reraise=True,
     )
     def _fetch(self):
