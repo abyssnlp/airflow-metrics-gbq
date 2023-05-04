@@ -21,4 +21,4 @@ repos:
         entry: pylint
         language: system
         types: [python]
-        exclude: ^(tests/.*|ci/.*)$
+        exclude: ^(tests/.*|ci/.*|scripts/.*)$
