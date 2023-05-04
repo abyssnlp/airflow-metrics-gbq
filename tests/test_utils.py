@@ -52,7 +52,7 @@ def test_logger_name(mock_handler):
 
 
 def test_logger_handlers(mock_handler):
-    assert len(mock_handler.handlers) == 1
+    assert len(mock_handler.handlers) == 2
 
 
 def test_logger_mock_handler(mock_handler):
