@@ -1,6 +1,7 @@
 import concurrent.futures
 import multiprocessing
 import os
+import random
 import socket
 import time
 import threading
@@ -9,7 +10,7 @@ from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 import atexit
 import typing as t
-from enum import Enum, unique
+from enum import Enum, unique, auto
 from collections import defaultdict
 from dataclasses import dataclass
 import pandas as pd
@@ -34,6 +35,13 @@ class Point:
     timestamp: float
     check: t.Optional[str] = None
     name: t.Optional[str] = None
+
+
+class Mode(Enum):
+    """Mode of execution"""
+
+    SYNC = auto()
+    ASYNC = auto()
 
 
 @unique
@@ -111,7 +119,9 @@ class AirflowMonitor:
         last_table: str,
         timers_table: str,
         num_threads: int = (multiprocessing.cpu_count() // 2),
+        mode: Mode = Mode.SYNC,
     ):
+        self._mode = mode
         self.dataset_id = dataset_id
         self.counts_table = counts_table
         self.last_table = last_table
@@ -119,27 +129,30 @@ class AirflowMonitor:
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = gcp_credentials
         self.gbq_connector = GoogleBigQueryConnector(gcp_credentials)
         self.logger = setup_gcloud_logging("airflow_monitoring", gcp_credentials)
-        # track batch time
-        self._last_flush = time.time()
-        # buffer
-        self.pool = ThreadPoolExecutor(max_workers=num_threads)
-        self._metrics = []
-        self._buffer = Queue(maxsize=self.CAPACITY + 50)
-        self.monitor_batch = threading.Event()
-        self.monitor_batch.set()
-
-        # Flush running
-        self.is_flush_running = threading.Event()
-        self.is_flush_running.clear()
-
         # Metrics connection
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._sock.bind((host, port))
 
-        # Fetch into queue from socket
-        self.pool.submit(self._fetch).add_done_callback(self.callback)
-        self.pool.submit(self.monitor).add_done_callback(self.callback)
-        atexit.register(self.close)
+        if self._mode == Mode.ASYNC:
+            # track batch time
+            self._last_flush = time.time()
+            # buffer
+            self.pool = ThreadPoolExecutor(max_workers=num_threads)
+            self._metrics = []
+            self._buffer = Queue(maxsize=self.CAPACITY + 50)
+            self.monitor_batch = threading.Event()
+            self.monitor_batch.set()
+
+            # Flush running
+            self.is_flush_running = threading.Event()
+            self.is_flush_running.clear()
+
+            # Fetch into queue from socket
+            self.pool.submit(self._fetch).add_done_callback(self.callback)
+            self.pool.submit(self.monitor).add_done_callback(self.callback)
+            atexit.register(self.close)
+        else:
+            self._container = []
 
     def monitor(self):
         """Monitor batch time for flushing metrics"""
@@ -169,14 +182,28 @@ class AirflowMonitor:
         self.pool.shutdown()
         self.logger.debug("Done")
 
-    def run(self):
-        """Entrypoint to flush the queue to BigQuery based on num. records"""
+    def run_async(self):
+        """Async flush the queue to BigQuery based on num. records"""
         while True:
             if self._buffer.qsize() >= self.CAPACITY and not self.is_flush_running.is_set():
                 self.is_flush_running.set()
                 self.flush_queue()
                 self.is_flush_running.clear()
             time.sleep(1)
+
+    def run_sync(self):
+        """Runs the fetch and upload to GBQ synchronously"""
+        while True:
+            time.sleep(random.randint(1, 5))
+            self._fetch_sync()
+            self.send_metrics(self._container)
+
+    def run(self):
+        """Entrypoint to run in sync or async mode"""
+        if self._mode == Mode.ASYNC:
+            self.run_async()
+        else:
+            self.run_sync()
 
     def flush_queue(self):
         """Flush the queue to BigQuery"""
@@ -189,6 +216,18 @@ class AirflowMonitor:
             self.logger.debug(f"Flushing out {len(metrics)} metrics to BigQuery")
             self.send_metrics(metrics)
             self._last_flush = time.time()
+
+    def _fetch_sync(self):
+        """Fetch metrics sync"""
+        self._container = []
+
+        while len(self._container) <= self.CAPACITY:
+            measure: str = self._sock.recv(1024).decode("utf-8")
+
+            try:
+                self._container.append(PointWithType.from_record(measure))
+            except IndexError as e:
+                self.logger.error(f"Seems like there is no record, measure: {measure}, error: {e}")
 
     @retry(
         retry=(retry_if_exception_type(queue.Full) | retry_if_exception_type(NoMetricFoundException)),
@@ -213,6 +252,7 @@ class AirflowMonitor:
 
     def _get_dfs(self, metrics: t.List[PointWithType]) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
         """Get dataframes to upload"""
+
         measure_dict = self._part_types(metrics)
 
         df_counts, df_last, df_timer = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()

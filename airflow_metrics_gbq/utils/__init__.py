@@ -1,3 +1,4 @@
+import sys
 import logging
 from google.cloud.logging_v2.client import Client as logging_client
 from google.cloud.logging.handlers import CloudLoggingHandler
@@ -12,7 +13,9 @@ def setup_gcloud_logging(app_name, gcp_credentials_path):
     logger.setLevel(logging.DEBUG)
     gcloud_logging_client = logging_client.from_service_account_json(gcp_credentials_path)
     gcloud_logging_handler = CloudLoggingHandler(gcloud_logging_client, name=app_name)
+    stream_handler = logging.StreamHandler(sys.stdout)
     logger.addHandler(gcloud_logging_handler)
+    logger.addHandler(stream_handler)
     return logger
 
 
