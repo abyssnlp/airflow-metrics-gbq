@@ -17,6 +17,8 @@ Sends airflow metrics to Bigquery
 pip install airflow-metrics-gbq
 ```
 
+Supports both sync and async ways to send metrics to GBQ. Async support has been added after v0.0.4
+
 ### Usage
 1. Activate statsd metrics in `airflow.cfg`
 ```ini
