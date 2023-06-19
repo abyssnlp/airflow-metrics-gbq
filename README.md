@@ -10,12 +10,12 @@ Airflow Metrics to BigQuery
 
 Sends airflow metrics to Bigquery
 
-
+Latest Version: `0.1.0`
 ---
 
 ### Installation
 ```bash
-pip install airflow-metrics-gbq
+pip install airflow-metrics-gbq==0.1.0
 ```
 
 Supports both sync and async ways to send metrics to GBQ. Async support has been added after v0.0.4
